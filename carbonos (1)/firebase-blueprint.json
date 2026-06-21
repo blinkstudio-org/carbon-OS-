@@ -1,0 +1,103 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User carbon profile and onboarding state",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "The unique user identifier matching system UID" },
+        "name": { "type": "string", "description": "Display name" },
+        "onboarded": { "type": "boolean", "description": "Whether user completed carbon calculation onboarding" },
+        "carbonScore": { "type": "number", "description": "Overall score from 0 to 1000 representing footprint performance" },
+        "xp": { "type": "number", "description": "Sustainability Experience Points" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "onboarded", "carbonScore", "xp"]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "Logged emissions reduction habits & actions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "category": { "type": "string", "enum": ["transport", "food", "housing", "shopping"] },
+        "type": { "type": "string" },
+        "description": { "type": "string" },
+        "co2Saved": { "type": "number", "description": "kg CO2e saved by this action" },
+        "xpReward": { "type": "number", "description": "XP earned" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "category", "type", "description", "co2Saved", "xpReward", "createdAt"]
+    },
+    "SavedSpot": {
+      "title": "SavedSpot",
+      "description": "Bookmarked public eco dropoff centers from Nominatim OSM Database",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "spotId": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string" },
+        "address": { "type": "string" },
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "spotId", "name", "type", "createdAt"]
+    },
+    "UserMission": {
+      "title": "UserMission",
+      "description": "User completion records for recurring green missions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "missionId": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "claimed": { "type": "boolean" },
+        "completedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "missionId", "completed", "claimed"]
+    },
+    "SanctuaryItem": {
+      "title": "SanctuaryItem",
+      "description": "Green sanctuary plants or climate mitigation devices purchased",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "typeId": { "type": "string" },
+        "name": { "type": "string" },
+        "purchasedAt": { "type": "string", "format": "date-time" },
+        "growth": { "type": "number" },
+        "lastNurturedAt": { "type": "string", "format": "date-time" },
+        "nurtureCount": { "type": "number" }
+      },
+      "required": ["id", "typeId", "name", "purchasedAt", "growth", "nurtureCount"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Individual carbon footprints database"
+    },
+    "/users/{userId}/activity_logs/{logId}": {
+      "schema": "ActivityLog",
+      "description": "Audit logs of sustainable lifestyle actions"
+    },
+    "/users/{userId}/saved_spots/{spotId}": {
+      "schema": "SavedSpot",
+      "description": "Bookmarked community eco stations"
+    },
+    "/users/{userId}/user_missions/{missionId}": {
+      "schema": "UserMission",
+      "description": "Challenges and missions logged"
+    },
+    "/users/{userId}/sanctuary_items/{itemId}": {
+      "schema": "SanctuaryItem",
+      "description": "Personal Eco Sanctuary active environmental assets"
+    }
+  }
+}

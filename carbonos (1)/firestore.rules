@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default deny everything
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Custom helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Ensures the user can only access documents in their own hierarchy path
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Rules for individual profiles under their authenticated uid
+    match /users/{userId} {
+      allow get, create, update: if isOwner(userId);
+      allow delete: if false; // Profiles cannot be self-deleted to prevent rapid state tampering
+
+      // Activity logs subcollection
+      match /activity_logs/{logId} {
+        allow list, get, create: if isOwner(userId);
+        allow update, delete: if isOwner(userId); // Allow complete management of own logs
+      }
+
+      // Bookmarked eco nodes subcollection
+      match /saved_spots/{spotId} {
+        allow list, get, create, delete: if isOwner(userId);
+      }
+
+      // Custom progress and claim states subcollection
+      match /user_missions/{missionId} {
+        allow list, get, create, update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+
+      // Live Eco Sanctuary plants / devices subcollection
+      match /sanctuary_items/{itemId} {
+        allow list, get, create, update, delete: if isOwner(userId);
+      }
+    }
+  }
+}
